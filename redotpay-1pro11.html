@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RedotPay</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--bg2:#111;--bg3:#181818;
+  --card:#1c1c1c;--card2:#222;--card3:#2a2a2a;
+  --border:#2a2a2a;--border2:#333;--border3:#404040;
+  --text:#f5f5f5;--muted:#888;--muted2:#aaa;
+  --rd:#e63946;--rd2:#ff4d5a;--rd3:#ff8c94;
+  --orange:#ff6b35;--green:#22c55e;
+  --danger:#ff4444;--blue:#60a5fa;--yellow:#fbbf24;
+}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* AUTH */
+#auth-screen{display:flex;min-height:100vh;position:relative;overflow:hidden}
+.auth-left{flex:1;background:var(--rd);display:flex;align-items:center;justify-content:center;padding:3rem;position:relative;overflow:hidden}
+.auth-left-bg{position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.03) 0px,rgba(255,255,255,.03) 1px,transparent 1px,transparent 24px)}
+.alc{position:absolute;border-radius:50%;background:rgba(255,255,255,.08)}
+.alc1{width:400px;height:400px;bottom:-100px;left:-100px}
+.alc2{width:250px;height:250px;top:-60px;right:-60px}
+.auth-brand{position:relative;z-index:1;text-align:center;color:#fff}
+.auth-brand-logo{width:80px;height:80px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);border-radius:22px;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:800}
+.auth-brand h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:800;margin-bottom:.5rem}
+.auth-brand p{font-size:14px;opacity:.8;line-height:1.6;max-width:260px;margin:0 auto}
+.auth-feats{margin-top:2rem;display:flex;flex-direction:column;gap:.8rem}
+.af{display:flex;align-items:center;gap:10px;font-size:13px;opacity:.9}
+.af-ico{width:28px;height:28px;background:rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.auth-right{width:min(460px,100%);background:var(--bg2);display:flex;align-items:center;justify-content:center;padding:2.5rem}
+.auth-box{width:100%}
+.auth-box-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:24px;font-weight:800;margin-bottom:.3rem}
+.auth-box-sub{font-size:13px;color:var(--muted);margin-bottom:2rem}
+.auth-tabs{display:flex;border-bottom:2px solid var(--border2);margin-bottom:1.5rem}
+.auth-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:.2s}
+.auth-tab.active{color:var(--rd2);border-bottom-color:var(--rd2)}
+.fg{margin-bottom:1rem}
+.lbl{font-size:12px;color:var(--muted2);display:block;margin-bottom:5px;font-weight:500}
+.inp{width:100%;background:var(--card);border:1.5px solid var(--border2);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;outline:none;font-family:'Cairo',sans-serif;transition:.2s}
+.inp:focus{border-color:var(--rd2);background:var(--card2)}
+.forgot-link{font-size:12px;color:var(--rd2);cursor:pointer;text-align:left;display:block;margin-top:.3rem;background:none;border:none;font-family:'Cairo',sans-serif}
+.forgot-link:hover{text-decoration:underline}
+.btn-rd{width:100%;background:var(--rd);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-rd:hover{background:var(--rd2)}
+.btn-rd:disabled{opacity:.45;cursor:not-allowed}
+.btn-outline{width:100%;background:transparent;color:var(--text);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Cairo',sans-serif;transition:.2s}
+.btn-outline:hover{border-color:var(--rd);color:var(--rd)}
+.err-txt{color:var(--danger);font-size:12px;margin-top:.4rem;min-height:15px;text-align:center}
+.ok-txt{color:var(--green);font-size:12px;margin-top:.4rem;text-align:center;min-height:15px}
+.spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* APP */
+#app-screen{display:none;min-height:100vh}
+.app-wrap{display:flex;min-height:100vh}
+.sidebar{width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:50}
+.sb-hd{padding:1.5rem;border-bottom:1px solid var(--border)}
+.sb-logo{display:flex;align-items:center;gap:10px}
+.sb-logo-mark{width:36px;height:36px;background:var(--rd);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:800;color:#fff}
+.sb-logo-txt{font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:800}
+.sb-user{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--rd),var(--orange));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.sb-uname{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-uemail{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-nav{flex:1;padding:1rem 0;overflow-y:auto}
+.sb-sec{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:.5rem 1.5rem .3rem}
+.sni{display:flex;align-items:center;gap:10px;padding:.65rem 1.5rem;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted2);transition:.15s;border-right:3px solid transparent;margin-bottom:2px;font-family:'Cairo',sans-serif}
+.sni:hover{color:var(--text);background:var(--card)}
+.sni.active{color:var(--rd2);background:rgba(230,57,70,.08);border-right-color:var(--rd2);font-weight:600}
+.sni-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:transparent;transition:.15s}
+.sni.active .sni-ico{background:rgba(230,57,70,.15)}
+.sb-bot{padding:1rem 1.5rem;border-top:1px solid var(--border)}
+.sb-out{display:flex;align-items:center;gap:8px;width:100%;background:none;border:1.5px solid var(--border2);border-radius:8px;padding:9px 14px;color:var(--muted);cursor:pointer;font-size:13px;font-family:'Cairo',sans-serif;transition:.2s}
+.sb-out:hover{border-color:var(--danger);color:var(--danger)}
+
+/* SIDEBAR HIDDEN BY DEFAULT */
+.sidebar{
+  position:fixed;right:0;top:0;bottom:0;z-index:200;
+  width:260px;
+  transform:translateX(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.sidebar.open{transform:translateX(0)}
+
+/* OVERLAY */
+.sb-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  z-index:190;opacity:0;pointer-events:none;
+  transition:opacity .3s;
+  backdrop-filter:blur(2px);
+}
+.sb-overlay.show{opacity:1;pointer-events:all}
+
+.main-area{margin-right:0;flex:1;min-height:100vh}
+.topbar{background:rgba(17,17,17,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);height:58px;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.tb-ttl{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700}
+.tb-left{display:flex;align-items:center;gap:12px}
+
+/* MENU BUTTON — 3 dots */
+.menu-btn{
+  width:38px;height:38px;
+  background:var(--card);border:1.5px solid var(--border2);
+  border-radius:10px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  transition:.2s;flex-shrink:0;
+}
+.menu-btn:hover{border-color:var(--rd2);background:rgba(230,57,70,.08)}
+.menu-btn.active{border-color:var(--rd2);background:rgba(230,57,70,.1)}
+.menu-btn-dot{width:4px;height:4px;background:var(--muted2);border-radius:50%;transition:.2s}
+.menu-btn.active .menu-btn-dot{background:var(--rd2)}
+
+.live-pill{display:flex;align-items:center;gap:5px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--green)}
+.ldot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.content{padding:1.5rem;max-width:980px}
+.page{display:none}
+.page.active{display:block;animation:fi .25s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* BALANCE HERO */
+.bal-hero{background:linear-gradient(135deg,var(--rd) 0%,#c1121f 50%,#9d0208 100%);border-radius:20px;padding:2rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.bh-pat{position:absolute;inset:0;background:repeating-linear-gradient(-45deg,rgba(255,255,255,.02) 0px,rgba(255,255,255,.02) 1px,transparent 1px,transparent 20px)}
+.bh-c{position:absolute;border-radius:50%;background:rgba(255,255,255,.06)}
+.bhc1{width:300px;height:300px;top:-80px;left:-60px}
+.bhc2{width:200px;height:200px;bottom:-60px;right:40px}
+.bh-lbl{font-size:11px;color:rgba(255,255,255,.6);font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.5rem;position:relative}
+.bh-amt{font-family:'Plus Jakarta Sans',sans-serif;font-size:46px;font-weight:800;color:#fff;letter-spacing:-2px;line-height:1;position:relative}
+.bh-usdt{font-size:13px;color:rgba(255,255,255,.6);margin-top:.4rem;position:relative}
+.bh-acts{display:flex;gap:10px;margin-top:1.8rem;flex-wrap:wrap;position:relative}
+.bh-btn{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 16px;color:#fff;cursor:pointer;font-size:13px;font-weight:600;font-family:'Cairo',sans-serif;transition:.2s;backdrop-filter:blur(4px)}
+.bh-btn:hover{background:rgba(255,255,255,.25)}
+.bh-btn.wh{background:#fff;color:var(--rd);border-color:#fff}
+.bh-btn.wh:hover{opacity:.9;background:#fff}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
+.stat{background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:1.2rem;display:flex;align-items:center;gap:12px}
+.stat-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.stat-val{font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:700;line-height:1}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:.2rem}
+
+.sec-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.sec-ttl{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700}
+.sec-btn{font-size:12px;color:var(--rd2);cursor:pointer;background:none;border:none;font-family:'Cairo',sans-serif}
+
+/* TX */
+.tx-box{background:var(--card);border:1px solid var(--border2);border-radius:16px;overflow:hidden}
+.tx-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);transition:.15s}
+.tx-row:last-child{border:none}
+.tx-row:hover{background:var(--card2)}
+.tx-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.tx-inf{flex:1;min-width:0}
+.tx-nm{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-dt{font-size:11px;color:var(--muted);margin-top:2px}
+.tx-am{font-weight:700;font-size:13px;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif}
+.pos{color:var(--green)}.neg{color:var(--danger)}
+.empty{padding:3rem;text-align:center;color:var(--muted)}
+.ei{font-size:36px;display:block;margin-bottom:.5rem}
+
+/* WALLET */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.2rem}
+.pcard{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:1.5rem}
+.pcard h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1.1rem}
+.qa-wrap{display:flex;gap:6px;flex-wrap:wrap;margin:.5rem 0 .8rem}
+.qa{background:var(--card2);border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text);font-family:'Cairo',sans-serif;transition:.2s}
+.qa:hover,.qa.sel{border-color:var(--rd2);color:var(--rd2);background:rgba(230,57,70,.08)}
+.btn-send{width:100%;background:var(--rd);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;transition:.2s}
+.btn-send:hover{background:var(--rd2)}
+.btn-send:disabled{opacity:.45;cursor:not-allowed}
+.topup-opt{display:flex;align-items:center;gap:12px;padding:12px;background:var(--card2);border:1.5px solid var(--border2);border-radius:12px;cursor:pointer;transition:.2s;margin-bottom:.7rem}
+.topup-opt:hover{border-color:var(--rd2)}
+.topup-opt.disabled{opacity:.4;pointer-events:none}
+.topup-opt-ico{width:40px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.soon-tag{font-size:10px;background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.2);border-radius:4px;padding:1px 6px;margin-right:4px}
+.addr-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.addr-val{background:var(--card2);border:1.5px solid var(--border2);border-radius:9px;padding:10px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:var(--rd3);flex:1;word-break:break-all}
+
+/* CARD */
+.vcard-wrap{width:min(400px,100%);margin:0 auto 1.5rem;background:linear-gradient(135deg,#1a0000 0%,#3d0000 40%,#1a0a00 100%);border-radius:22px;padding:2rem;position:relative;overflow:hidden;box-shadow:0 20px 60px rgba(230,57,70,.25);border:1px solid rgba(230,57,70,.2)}
+.vc-pat{position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.015) 0,rgba(255,255,255,.015) 1px,transparent 1px,transparent 16px)}
+.vc-glow{position:absolute;top:-60px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(230,57,70,.3),transparent 70%);pointer-events:none}
+.vc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;position:relative}
+.vc-brand-r{display:flex;align-items:center;gap:3px;font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:900;color:#fff;line-height:1}
+.vc-brand-dot{width:10px;height:10px;background:var(--rd2);border-radius:50%;margin-top:3px}
+.vc-brand-sub{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
+.vc-sig{display:flex;gap:2px;align-items:flex-end}
+.vc-sig span{background:rgba(255,255,255,.5);border-radius:1px}
+.vc-chip{width:44px;height:34px;background:linear-gradient(135deg,#b8860b,#ffd700,#b8860b);border-radius:7px;margin-bottom:1.3rem;position:relative;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.vc-chip::after{content:'';position:absolute;inset:5px;border:1px solid rgba(255,255,255,.25);border-radius:4px}
+.vc-num{font-size:14px;letter-spacing:3.5px;color:rgba(255,255,255,.85);margin-bottom:1.3rem;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;position:relative}
+.vc-bot{display:flex;justify-content:space-between;align-items:flex-end;position:relative}
+.vc-lbl{font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.7px}
+.vc-val{font-size:12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;margin-top:2px}
+.vc-mc{display:flex}
+.vc-mc-c{width:30px;height:30px;border-radius:50%}
+.card-acts{display:flex;gap:8px;justify-content:center;margin-bottom:1.3rem;flex-wrap:wrap}
+.ca{display:flex;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--border2);border-radius:9px;padding:8px 14px;color:var(--text);cursor:pointer;font-size:12px;font-weight:600;font-family:'Cairo',sans-serif;transition:.2s}
+.ca:hover{border-color:var(--rd2);color:var(--rd2)}
+.ci-table{background:var(--card);border:1px solid var(--border2);border-radius:14px;overflow:hidden}
+.ci-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px}
+.ci-row:last-child{border:none}
+.ci-lbl{color:var(--muted)}
+
+/* TX FILTERS */
+.fil-wrap{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.fb{background:var(--card);border:1.5px solid var(--border2);border-radius:8px;padding:6px 14px;color:var(--muted);cursor:pointer;font-size:12px;font-weight:600;font-family:'Cairo',sans-serif;transition:.2s}
+.fb.active{background:var(--rd);border-color:var(--rd);color:#fff}
+
+/* SETTINGS */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.scard{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:1.5rem}
+.scard-hd{display:flex;align-items:center;gap:10px;margin-bottom:1.3rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.scard-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.scard-ttl{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700}
+.scard-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.pr-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.pr-row:last-child{border:none}
+.pr-lbl{color:var(--muted)}
+.pr-val{font-weight:500}
+.btn-sm{width:100%;background:var(--rd);color:#fff;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;transition:.2s}
+.btn-sm:hover{background:var(--rd2)}
+.btn-sm:disabled{opacity:.45;cursor:not-allowed}
+.btn-sm-outline{width:100%;background:var(--card2);color:var(--text);border:1.5px solid var(--border2);border-radius:9px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Cairo',sans-serif;transition:.2s}
+.btn-sm-outline:hover{border-color:var(--rd);color:var(--rd)}
+.dz{background:rgba(255,68,68,.05);border:1px solid rgba(255,68,68,.15);border-radius:12px;padding:1.2rem;margin-top:1rem}
+.dz-ttl{font-size:13px;font-weight:700;color:var(--danger);margin-bottom:.8rem}
+.dz-btn{width:100%;background:none;border:1.5px solid var(--danger);color:var(--danger);border-radius:9px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Cairo',sans-serif;transition:.2s}
+.dz-btn:hover{background:rgba(255,68,68,.1)}
+
+/* MODALS */
+.mov{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:.2s}
+.mov.open{opacity:1;pointer-events:all}
+.mov.open .mbox{transform:none;opacity:1}
+.mbox{background:var(--card);border:1px solid var(--border2);border-radius:20px;width:min(440px,94vw);transform:translateY(12px);opacity:0;transition:.25s;max-height:90vh;overflow-y:auto}
+.mhd{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.mbk{background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;transition:.2s}
+.mbk:hover{color:var(--text)}
+.mttl{flex:1;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700}
+.mcl{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;transition:.2s}
+.mcl:hover{color:var(--danger)}
+.mbody{padding:1.5rem}
+.amt-d{background:var(--bg2);border:1.5px solid var(--border2);border-radius:14px;padding:1.4rem;text-align:center;margin-bottom:1.1rem}
+.amt-big{font-family:'Plus Jakarta Sans',sans-serif;font-size:46px;font-weight:800;color:var(--text);letter-spacing:-3px;line-height:1}
+.amt-sub{font-size:13px;color:var(--muted);margin-top:.4rem}
+.send-prev{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:.8rem}
+.conn-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:4px 10px;font-size:11px;color:var(--green);margin-bottom:1rem}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);border-radius:10px;padding:10px 20px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:8px}
+#toast.show{opacity:1}
+#toast.ok{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:var(--green)}
+#toast.err{background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.2);color:var(--danger)}
+#toast.info{background:var(--card2);border:1px solid var(--border2);color:var(--text)}
+
+@media(max-width:768px){
+  .auth-left{display:none}
+  .auth-right{width:100%;padding:2rem 1.2rem}
+  .sidebar{width:60px}
+  .sb-logo-txt,.sb-uname,.sb-uemail,.sni span:not(.sni-ico),.sb-sec,.sb-out span:last-child{display:none}
+  .sb-user{justify-content:center}
+  .sni{justify-content:center;padding:.65rem}
+  .sni-ico{margin:0}
+  .sb-hd{padding:1rem;display:flex;justify-content:center}
+  .main-area{margin-right:60px}
+  .two-col,.settings-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+
+<!-- PW TOPUP MODAL -->
+<div class="mov" id="m-pw">
+  <div class="mbox">
+    <div class="mhd">
+      <button class="mbk" id="pw-back" onclick="showPWS(0)" style="display:none">&#8249;</button>
+      <div class="mttl" id="pw-ttl">شحن من Perfect Wallet</div>
+      <button class="mcl" onclick="cm('m-pw')">&#10005;</button>
+    </div>
+    <div class="mbody">
+      <div id="pws0">
+        <div class="conn-badge">&#128279; متصل بـ Perfect Wallet</div>
+        <div class="amt-d"><div class="amt-big" id="pw-big">$0</div><div class="amt-sub">المبلغ المراد شحنه</div></div>
+        <div class="qa-wrap">
+          <div class="qa" onclick="setPWA(10,this)">$10</div><div class="qa" onclick="setPWA(25,this)">$25</div>
+          <div class="qa" onclick="setPWA(50,this)">$50</div><div class="qa" onclick="setPWA(100,this)">$100</div>
+          <div class="qa" onclick="setPWA(250,this)">$250</div><div class="qa" onclick="setPWA(500,this)">$500</div>
+        </div>
+        <div class="fg"><input class="inp" id="pw-custom" type="number" placeholder="مبلغ مخصص..." oninput="onPWC(this)" style="background:var(--bg2)"></div>
+        <div class="err-txt" id="pw-e0"></div>
+        <button class="btn-rd" onclick="pwNext()">التالي &rsaquo;</button>
+      </div>
+      <div id="pws1" style="display:none">
+        <div style="background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.2);border-radius:10px;padding:11px 14px;margin-bottom:1.1rem;display:flex;align-items:center;gap:10px">
+          <div style="width:30px;height:30px;background:#2563eb;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#fff">P</div>
+          <div><div style="font-size:13px;font-weight:600">Perfect Wallet Card</div><div style="font-size:11px;color:var(--muted)">أدخل بيانات بطاقتك في Perfect Wallet</div></div>
+        </div>
+        <div class="fg"><label class="lbl">رقم البطاقة</label><input class="inp" id="pw-cn" maxlength="19" placeholder="0000 0000 0000 0000" style="background:var(--bg2);font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:2px" oninput="fmtC(this)"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="fg"><label class="lbl">تاريخ الانتهاء</label><input class="inp" id="pw-ex" maxlength="5" placeholder="MM/YY" style="background:var(--bg2);font-family:'Plus Jakarta Sans',sans-serif" oninput="fmtE(this)"></div>
+          <div class="fg"><label class="lbl">CVV</label><input class="inp" id="pw-cv" maxlength="3" type="password" placeholder="&#8226;&#8226;&#8226;" style="background:var(--bg2)"></div>
+        </div>
+        <div class="err-txt" id="pw-e1"></div>
+        <button class="btn-rd" id="pw-vbtn" onclick="verifyPW()">تحقق وشحن &#10003;</button>
+      </div>
+      <div id="pws2" style="display:none;text-align:center;padding:1rem 0">
+        <div style="font-size:56px;margin-bottom:.8rem">&#9989;</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;margin-bottom:.4rem">تم الشحن!</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:1.5rem" id="pw-smsg"></div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1.5rem">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:.3rem">رصيدك الجديد</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:800;color:var(--green)" id="pw-sbal">$0</div>
+        </div>
+        <button class="btn-outline" onclick="cm('m-pw')">إغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEND MODAL -->
+<div class="mov" id="m-send">
+  <div class="mbox">
+    <div class="mhd"><div class="mttl">إرسال رصيد</div><button class="mcl" onclick="cm('m-send')">&#10005;</button></div>
+    <div class="mbody">
+      <div class="fg"><label class="lbl">بريد المستلم</label><input class="inp" id="ms-to" type="email" placeholder="user@example.com" style="background:var(--bg2)"></div>
+      <div class="fg">
+        <label class="lbl">المبلغ ($)</label>
+        <input class="inp" id="ms-amt" type="number" placeholder="0.00" style="background:var(--bg2)" oninput="updSP()">
+        <div class="qa-wrap"><div class="qa" onclick="setSA(10)">$10</div><div class="qa" onclick="setSA(25)">$25</div><div class="qa" onclick="setSA(50)">$50</div><div class="qa" onclick="setSA(100)">$100</div></div>
+      </div>
+      <div class="fg"><label class="lbl">ملاحظة (اختياري)</label><input class="inp" id="ms-note" placeholder="..." style="background:var(--bg2)"></div>
+      <div class="send-prev">رصيدك: <strong id="sp-b" style="color:var(--text)">$0</strong> &nbsp;|&nbsp; بعد: <strong id="sp-a" style="color:var(--green)">$0</strong></div>
+      <div class="err-txt" id="ms-err"></div>
+      <button class="btn-rd" id="ms-btn" onclick="doSendModal()">إرسال &#8593;</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="mov" id="m-forgot">
+  <div class="mbox">
+    <div class="mhd"><div class="mttl">&#128273; استعادة كلمة المرور</div><button class="mcl" onclick="cm('m-forgot')">&#10005;</button></div>
+    <div class="mbody">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:1.2rem;line-height:1.6">أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور</p>
+      <div class="fg"><label class="lbl">البريد الإلكتروني</label><input class="inp" id="fg-email" type="email" placeholder="you@example.com" style="background:var(--bg2)"></div>
+      <div class="err-txt" id="fg-err"></div>
+      <div class="ok-txt" id="fg-ok"></div>
+      <button class="btn-rd" id="fg-btn" onclick="sendForgot()">إرسال رابط الاستعادة &#128231;</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-left">
+    <div class="auth-left-bg"></div>
+    <div class="alc alc1"></div><div class="alc alc2"></div>
+    <div class="auth-brand">
+      <div class="auth-brand-logo">R</div>
+      <h1>RedotPay</h1>
+      <p>منصة الدفع الرقمية السريعة والآمنة لكل احتياجاتك المالية</p>
+      <div class="auth-feats">
+        <div class="af"><div class="af-ico">&#9889;</div><span>تحويل فوري بين المستخدمين</span></div>
+        <div class="af"><div class="af-ico">&#128279;</div><span>متصل بـ Perfect Wallet</span></div>
+        <div class="af"><div class="af-ico">&#128274;</div><span>أمان عالي المستوى</span></div>
+        <div class="af"><div class="af-ico">&#128202;</div><span>تتبع المعاملات لحظياً</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <div class="auth-box-title" id="auth-title">مرحباً بعودتك</div>
+      <div class="auth-box-sub" id="auth-sub">سجّل دخولك للمتابعة</div>
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="swTab('login')">تسجيل الدخول</div>
+        <div class="auth-tab" onclick="swTab('reg')">حساب جديد</div>
+      </div>
+      <div id="login-f">
+        <div class="fg"><label class="lbl">البريد الإلكتروني</label><input class="inp" id="l-em" type="email" placeholder="you@example.com"></div>
+        <div class="fg">
+          <label class="lbl">كلمة المرور</label>
+          <input class="inp" id="l-pw" type="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;">
+          <button class="forgot-link" onclick="om('m-forgot')">نسيت كلمة المرور؟</button>
+        </div>
+        <button class="btn-rd" id="l-btn" onclick="doLogin()">دخول &rsaquo;</button>
+        <div class="err-txt" id="l-err"></div>
+      </div>
+      <div id="reg-f" style="display:none">
+        <div class="fg"><label class="lbl">الاسم الكامل</label><input class="inp" id="r-nm" placeholder="اسمك الكامل"></div>
+        <div class="fg"><label class="lbl">البريد الإلكتروني</label><input class="inp" id="r-em" type="email" placeholder="you@example.com"></div>
+        <div class="fg"><label class="lbl">كلمة المرور</label><input class="inp" id="r-pw" type="password" placeholder="6 أحرف على الأقل"></div>
+        <button class="btn-rd" id="r-btn" onclick="doReg()">إنشاء الحساب &rsaquo;</button>
+        <div class="err-txt" id="r-err"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen">
+  <div class="app-wrap">
+    <!-- OVERLAY -->
+    <div class="sb-overlay" id="sb-overlay" onclick="toggleMenu()"></div>
+
+    <div class="sidebar" id="sidebar">
+      <div class="sb-hd" style="display:flex;align-items:center;justify-content:space-between">
+        <div class="sb-logo"><div class="sb-logo-mark">R</div><div class="sb-logo-txt">RedotPay</div></div>
+        <button onclick="toggleMenu()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;padding:4px;line-height:1">&#10005;</button>
+      </div>
+      <div class="sb-user">
+        <div class="sb-av" id="sb-av">R</div>
+        <div style="min-width:0"><div class="sb-uname" id="sb-nm">مستخدم</div><div class="sb-uemail" id="sb-em">—</div></div>
+      </div>
+      <div class="sb-nav">
+        <div class="sb-sec">القائمة</div>
+        <div class="sni active" onclick="gp('home',this)" data-page="home"><div class="sni-ico">&#8942;</div><span>الرئيسية</span></div>
+        <div class="sni" onclick="gp('wallet',this)" data-page="wallet"><div class="sni-ico">&#9678;</div><span>المحفظة</span></div>
+        <div class="sni" onclick="gp('card',this)" data-page="card"><div class="sni-ico">&#9645;</div><span>البطاقة</span></div>
+        <div class="sni" onclick="gp('txs',this)" data-page="txs"><div class="sni-ico">&#8801;</div><span>المعاملات</span></div>
+        <div class="sb-sec" style="margin-top:.5rem">الحساب</div>
+        <div class="sni" onclick="gp('settings',this)" data-page="settings"><div class="sni-ico">&#9881;</div><span>الإعدادات</span></div>
+      </div>
+      <div class="sb-bot">
+        <button class="sb-out" onclick="doLogout()"><span>&#128682;</span><span>تسجيل الخروج</span></button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <div class="topbar">
+        <div class="tb-left">
+          <button class="menu-btn" id="menu-btn" onclick="toggleMenu()">
+            <div class="menu-btn-dot"></div>
+            <div class="menu-btn-dot"></div>
+            <div class="menu-btn-dot"></div>
+          </button>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:28px;height:28px;background:var(--rd);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:800;color:#fff">R</div>
+            <div class="tb-ttl" id="tb-ttl">الرئيسية</div>
+          </div>
+        </div>
+        <div class="live-pill"><div class="ldot"></div>مباشر</div>
+      </div>
+      <div class="content">
+
+        <!-- HOME -->
+        <div class="page active" id="page-home">
+          <div class="bal-hero">
+            <div class="bh-pat"></div><div class="bh-c bhc1"></div><div class="bh-c bhc2"></div>
+            <div class="bh-lbl">رصيدك الكلي</div>
+            <div class="bh-amt" id="h-bal">$0.00</div>
+            <div class="bh-usdt" id="h-usdt">&#8776; 0.00 USDT</div>
+            <div class="bh-acts">
+              <button class="bh-btn wh" onclick="om('m-pw')">&#8595; شحن</button>
+              <button class="bh-btn" onclick="om('m-send')">&#8593; إرسال</button>
+              <button class="bh-btn" onclick="copyAddr()">&#8853; استقبال</button>
+              <button class="bh-btn" onclick="gp('card',document.querySelector('[data-page=card]'))">&#9645; بطاقتي</button>
+            </div>
+          </div>
+          <div class="stats-row">
+            <div class="stat"><div class="stat-ico" style="background:rgba(255,68,68,.12);color:var(--danger)">&#8593;</div><div><div class="stat-val" id="sc-sent">$0</div><div class="stat-lbl">مُرسَل</div></div></div>
+            <div class="stat"><div class="stat-ico" style="background:rgba(34,197,94,.12);color:var(--green)">&#8595;</div><div><div class="stat-val" id="sc-recv">$0</div><div class="stat-lbl">مُستَقبَل</div></div></div>
+            <div class="stat"><div class="stat-ico" style="background:rgba(96,165,250,.12);color:var(--blue)">&#9670;</div><div><div class="stat-val" id="sc-cnt">0</div><div class="stat-lbl">معاملة</div></div></div>
+          </div>
+          <div class="sec-hd"><div class="sec-ttl">آخر المعاملات</div><button class="sec-btn" onclick="gp('txs',document.querySelector('[data-page=txs]'))">عرض الكل</button></div>
+          <div class="tx-box" id="home-tx"><div class="empty"><span class="ei">&#128205;</span>لا توجد معاملات بعد</div></div>
+        </div>
+
+        <!-- WALLET -->
+        <div class="page" id="page-wallet">
+          <div class="two-col">
+            <div class="pcard">
+              <h3>&#8593; إرسال رصيد</h3>
+              <div class="fg"><label class="lbl">بريد المستلم</label><input class="inp" id="w-to" type="email" placeholder="user@example.com" style="background:var(--bg2)"></div>
+              <div class="fg">
+                <label class="lbl">المبلغ ($)</label>
+                <input class="inp" id="w-amt" type="number" placeholder="0.00" style="background:var(--bg2)" oninput="updWP()">
+                <div class="qa-wrap"><div class="qa" onclick="setWA(10)">$10</div><div class="qa" onclick="setWA(25)">$25</div><div class="qa" onclick="setWA(50)">$50</div><div class="qa" onclick="setWA(100)">$100</div></div>
+              </div>
+              <div class="fg"><label class="lbl">ملاحظة</label><input class="inp" id="w-note" placeholder="..." style="background:var(--bg2)"></div>
+              <div class="send-prev">الرصيد: <strong id="wp-b" style="color:var(--text)">$0</strong> | بعد: <strong id="wp-a" style="color:var(--green)">$0</strong></div>
+              <div class="err-txt" id="w-err"></div>
+              <button class="btn-send" id="w-btn" onclick="doSendW()">إرسال &#8593;</button>
+            </div>
+            <div class="pcard">
+              <h3>&#8595; شحن المحفظة</h3>
+              <div class="topup-opt" onclick="om('m-pw')">
+                <div class="topup-opt-ico" style="background:rgba(37,99,235,.15)"><div style="width:26px;height:26px;background:#2563eb;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:800;color:#fff">P</div></div>
+                <div><div style="font-size:13px;font-weight:600">Perfect Wallet</div><div style="font-size:11px;color:var(--muted)">شحن فوري بدون رسوم</div></div>
+                <span style="color:var(--muted);margin-right:auto">&#8250;</span>
+              </div>
+              <div class="topup-opt disabled"><div class="topup-opt-ico" style="background:rgba(96,165,250,.1);color:var(--blue)">&#127970;</div><div><div style="font-size:13px;font-weight:600">تحويل بنكي <span class="soon-tag">قريباً</span></div></div></div>
+              <div class="topup-opt disabled"><div class="topup-opt-ico" style="background:rgba(34,197,94,.1);color:var(--green)">&#8383;</div><div><div style="font-size:13px;font-weight:600">Crypto USDT <span class="soon-tag">قريباً</span></div></div></div>
+            </div>
+          </div>
+          <div class="pcard"><h3>&#8853; استقبال رصيد</h3>
+            <div class="addr-row"><div class="addr-val" id="my-addr">—</div><button class="ca" onclick="copyAddr()">&#128203; نسخ</button></div>
+          </div>
+        </div>
+
+        <!-- CARD -->
+        <div class="page" id="page-card">
+          <div class="vcard-wrap">
+            <div class="vc-pat"></div><div class="vc-glow"></div>
+            <div class="vc-top">
+              <div><div class="vc-brand-r">R<div class="vc-brand-dot"></div></div><div class="vc-brand-sub">RedotPay</div></div>
+              <div class="vc-sig"><span style="width:3px;height:8px"></span><span style="width:3px;height:12px"></span><span style="width:3px;height:16px"></span><span style="width:3px;height:20px"></span></div>
+            </div>
+            <div class="vc-chip"></div>
+            <div class="vc-num" id="vc-num">&#8226;&#8226;&#8226;&#8226; &#8226;&#8226;&#8226;&#8226; &#8226;&#8226;&#8226;&#8226; &#8226;&#8226;&#8226;&#8226;</div>
+            <div class="vc-bot">
+              <div><div class="vc-lbl">حامل البطاقة</div><div class="vc-val" id="vc-holder">—</div></div>
+              <div><div class="vc-lbl">VALID THRU</div><div class="vc-val">12/28</div></div>
+              <div><div class="vc-mc"><div class="vc-mc-c" style="background:#eb001b;opacity:.85"></div><div class="vc-mc-c" style="background:#f79e1b;margin-right:-12px;opacity:.85"></div></div></div>
+            </div>
+          </div>
+          <div class="card-acts">
+            <button class="ca" id="reveal-btn" onclick="revealCard()">&#128065; عرض الرقم</button>
+            <button class="ca" onclick="copyCardNum()">&#128203; نسخ</button>
+            <button class="ca" id="freeze-btn" onclick="freezeCard()">&#10052; تجميد</button>
+          </div>
+          <div class="ci-table">
+            <div class="ci-row"><span class="ci-lbl">الحالة</span><span id="c-status" style="color:var(--green);font-weight:700">نشطة &#10003;</span></div>
+            <div class="ci-row"><span class="ci-lbl">النوع</span><span>Mastercard Virtual</span></div>
+            <div class="ci-row"><span class="ci-lbl">الرصيد</span><span id="c-bal">$0.00</span></div>
+            <div class="ci-row"><span class="ci-lbl">CVV</span><span id="c-cvv">***</span></div>
+            <div class="ci-row"><span class="ci-lbl">حد الإنفاق الشهري</span><span>$10,000</span></div>
+            <div class="ci-row"><span class="ci-lbl">الشحن عبر Perfect Wallet</span><span style="color:var(--blue);font-weight:600">مدعوم &#10003;</span></div>
+          </div>
+        </div>
+
+        <!-- TRANSACTIONS -->
+        <div class="page" id="page-txs">
+          <div class="fil-wrap">
+            <button class="fb active" onclick="filTx('all',this)">الكل</button>
+            <button class="fb" onclick="filTx('sent',this)">مُرسَل</button>
+            <button class="fb" onclick="filTx('received',this)">مُستَقبَل</button>
+            <button class="fb" onclick="filTx('topup',this)">شحن</button>
+          </div>
+          <div class="tx-box" id="all-tx"><div class="empty"><span class="ei">&#128205;</span>لا توجد معاملات</div></div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="page" id="page-settings">
+          <div class="settings-grid">
+            <div class="scard">
+              <div class="scard-hd"><div class="scard-ico" style="background:rgba(96,165,250,.1);color:var(--blue)">&#128100;</div><div><div class="scard-ttl">معلومات الحساب</div><div class="scard-sub">بياناتك الشخصية</div></div></div>
+              <div class="pr-row"><span class="pr-lbl">الاسم</span><span class="pr-val" id="pr-name">—</span></div>
+              <div class="pr-row"><span class="pr-lbl">البريد</span><span class="pr-val" id="pr-email" style="font-size:12px">—</span></div>
+              <div class="pr-row"><span class="pr-lbl">UID</span><span class="pr-val" id="pr-uid" style="font-size:11px;color:var(--muted)">—</span></div>
+              <div class="pr-row"><span class="pr-lbl">تاريخ الانضمام</span><span class="pr-val" id="pr-joined" style="font-size:12px">—</span></div>
+              <div class="dz"><div class="dz-ttl">&#9888;&#65039; منطقة الخطر</div><button class="dz-btn" onclick="doLogout()">تسجيل الخروج من جميع الأجهزة</button></div>
+            </div>
+            <div class="scard">
+              <div class="scard-hd"><div class="scard-ico" style="background:rgba(230,57,70,.1);color:var(--rd2)">&#128272;</div><div><div class="scard-ttl">تغيير كلمة المرور</div><div class="scard-sub">غيّر كلمة مرورك بأمان</div></div></div>
+              <div style="display:flex;flex-direction:column;gap:.8rem">
+                <div class="fg" style="margin:0"><label class="lbl">كلمة المرور الحالية</label><input class="inp" id="cp-cur" type="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" style="background:var(--bg2)"></div>
+                <div class="fg" style="margin:0"><label class="lbl">كلمة المرور الجديدة</label><input class="inp" id="cp-new" type="password" placeholder="6 أحرف على الأقل" style="background:var(--bg2)"></div>
+                <div class="fg" style="margin:0"><label class="lbl">تأكيد كلمة المرور</label><input class="inp" id="cp-conf" type="password" placeholder="أعد الكتابة" style="background:var(--bg2)"></div>
+                <div class="err-txt" id="cp-err" style="margin:0"></div>
+                <div class="ok-txt" id="cp-ok" style="margin:0"></div>
+                <button class="btn-sm" id="cp-btn" onclick="changePass()">حفظ كلمة المرور الجديدة &#128272;</button>
+              </div>
+            </div>
+            <div class="scard">
+              <div class="scard-hd"><div class="scard-ico" style="background:rgba(251,191,36,.1);color:var(--yellow)">&#128231;</div><div><div class="scard-ttl">استعادة كلمة المرور</div><div class="scard-sub">إرسال رابط الاستعادة بالبريد</div></div></div>
+              <p style="font-size:13px;color:var(--muted);margin-bottom:1rem;line-height:1.6">يمكنك إرسال رابط إعادة التعيين على بريدك الإلكتروني مباشرة</p>
+              <button class="btn-sm-outline" onclick="sendForgotSettings()">إرسال رابط الاستعادة &#128231;</button>
+              <div class="ok-txt" id="fgs-ok" style="margin-top:.6rem"></div>
+            </div>
+            <div class="scard">
+              <div class="scard-hd"><div class="scard-ico" style="background:rgba(34,197,94,.1);color:var(--green)">&#128737;&#65039;</div><div><div class="scard-ttl">الأمان</div><div class="scard-sub">معلومات أمان حسابك</div></div></div>
+              <div class="pr-row"><span class="pr-lbl">حالة البريد</span><span class="pr-val" id="sec-email" style="color:var(--green);font-size:12px">— &#10003;</span></div>
+              <div class="pr-row"><span class="pr-lbl">آخر دخول</span><span class="pr-val" id="sec-last" style="font-size:12px">—</span></div>
+              <div class="pr-row"><span class="pr-lbl">الجلسة الحالية</span><span class="pr-val" style="color:var(--green);font-size:12px">&#9679; نشطة</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script>
+const fbc={apiKey:"AIzaSyC2euiKINjcx9Ay8qapBMCDbh9QFVzsVss",authDomain:"abdo-eea3d.firebaseapp.com",databaseURL:"https://abdo-eea3d-default-rtdb.firebaseio.com",projectId:"abdo-eea3d",storageBucket:"abdo-eea3d.firebasestorage.app",messagingSenderId:"516114812388",appId:"1:516114812388:web:a16dc18f4abe3"};
+if(!firebase.apps.length)firebase.initializeApp(fbc);
+const auth=firebase.auth();const db=firebase.database();
+let UID=null,BALANCE=0,ALL_TX=[],CUR_FIL='all',CARD_REV=false,CARD_FRZ=false,PW_AMT=0;
+
+function swTab(t){
+  document.querySelectorAll('.auth-tab').forEach((el,i)=>el.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='reg')));
+  document.getElementById('login-f').style.display=t==='login'?'block':'none';
+  document.getElementById('reg-f').style.display=t==='reg'?'block':'none';
+  document.getElementById('auth-title').textContent=t==='login'?'مرحباً بعودتك':'إنشاء حساب جديد';
+  document.getElementById('auth-sub').textContent=t==='login'?'سجّل دخولك للمتابعة':'انضم إلى RedotPay اليوم';
+}
+
+async function doLogin(){
+  const e=document.getElementById('l-em').value.trim(),p=document.getElementById('l-pw').value;
+  document.getElementById('l-err').textContent='';
+  if(!e||!p){document.getElementById('l-err').textContent='يرجى تعبئة الحقول';return;}
+  const btn=document.getElementById('l-btn');btn.disabled=true;btn.innerHTML='<span class="spin"></span> جاري الدخول...';
+  try{await auth.signInWithEmailAndPassword(e,p);}
+  catch(er){btn.disabled=false;btn.textContent='دخول ›';const m={'auth/user-not-found':'البريد غير مسجل','auth/wrong-password':'كلمة المرور خاطئة','auth/invalid-email':'بريد غير صالح','auth/too-many-requests':'محاولات كثيرة'};document.getElementById('l-err').textContent=m[er.code]||er.message;}
+}
+
+async function doReg(){
+  const nm=document.getElementById('r-nm').value.trim(),e=document.getElementById('r-em').value.trim(),p=document.getElementById('r-pw').value;
+  document.getElementById('r-err').textContent='';
+  if(!nm||!e||!p){document.getElementById('r-err').textContent='يرجى تعبئة جميع الحقول';return;}
+  if(p.length<6){document.getElementById('r-err').textContent='كلمة المرور قصيرة';return;}
+  const btn=document.getElementById('r-btn');btn.disabled=true;btn.innerHTML='<span class="spin"></span> جاري الإنشاء...';
+  try{
+    const c=await auth.createUserWithEmailAndPassword(e,p);
+    const uid=c.user.uid;
+    const cn='4'+Array.from({length:15},()=>Math.floor(Math.random()*10)).join('');
+    const cf=cn.replace(/(.{4})/g,'$1 ').trim();
+    const cvv=String(Math.floor(100+Math.random()*900));
+    await db.ref('Usersred/'+uid).set({uid,name:nm,email:e,balance:0,cardNumber:cf,cardCvv:cvv,cardFrozen:false,createdAt:Date.now()});
+  }catch(er){btn.disabled=false;btn.textContent='إنشاء الحساب ›';const m={'auth/email-already-in-use':'البريد مسجل مسبقاً','auth/weak-password':'كلمة المرور ضعيفة'};document.getElementById('r-err').textContent=m[er.code]||er.message;}
+}
+
+async function doLogout(){
+  if(UID){db.ref('Usersred/'+UID).off();db.ref('Usersred/'+UID+'/transactions').off();}
+  await auth.signOut();
+  UID=null;BALANCE=0;ALL_TX=[];CUR_FIL='all';
+  document.getElementById('app-screen').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+  document.getElementById('l-btn').disabled=false;document.getElementById('l-btn').textContent='دخول ›';
+  toast('تم تسجيل الخروج','info');
+}
+
+async function sendForgot(){
+  const e=document.getElementById('fg-email').value.trim();
+  document.getElementById('fg-err').textContent='';document.getElementById('fg-ok').textContent='';
+  if(!e){document.getElementById('fg-err').textContent='يرجى إدخال البريد';return;}
+  const btn=document.getElementById('fg-btn');btn.disabled=true;btn.innerHTML='<span class="spin"></span> جاري الإرسال...';
+  try{
+    await auth.sendPasswordResetEmail(e);
+    document.getElementById('fg-ok').textContent='تم الإرسال! تحقق من بريدك الإلكتروني';
+    document.getElementById('fg-email').value='';
+  }catch(er){const m={'auth/user-not-found':'البريد غير مسجل','auth/invalid-email':'بريد غير صالح'};document.getElementById('fg-err').textContent=m[er.code]||er.message;}
+  btn.disabled=false;btn.textContent='إرسال رابط الاستعادة';
+}
+
+async function sendForgotSettings(){
+  const user=auth.currentUser;if(!user)return;
+  const btn=event.target;btn.disabled=true;btn.textContent='جاري الإرسال...';
+  try{await auth.sendPasswordResetEmail(user.email);document.getElementById('fgs-ok').textContent='تم الإرسال على '+user.email;toast('تم إرسال رابط الاستعادة','ok');}
+  catch(er){toast('خطأ: '+er.message,'err');}
+  btn.disabled=false;btn.textContent='إرسال رابط الاستعادة';
+}
+
+async function changePass(){
+  const cur=document.getElementById('cp-cur').value,nw=document.getElementById('cp-new').value,cf2=document.getElementById('cp-conf').value;
+  document.getElementById('cp-err').textContent='';document.getElementById('cp-ok').textContent='';
+  if(!cur||!nw||!cf2){document.getElementById('cp-err').textContent='يرجى تعبئة جميع الحقول';return;}
+  if(nw.length<6){document.getElementById('cp-err').textContent='كلمة المرور الجديدة قصيرة';return;}
+  if(nw!==cf2){document.getElementById('cp-err').textContent='كلمتا المرور غير متطابقتين';return;}
+  const btn=document.getElementById('cp-btn');btn.disabled=true;btn.innerHTML='<span class="spin" style="border-top-color:#fff"></span> جاري التغيير...';
+  try{
+    const user=auth.currentUser;
+    const cred=firebase.auth.EmailAuthProvider.credential(user.email,cur);
+    await user.reauthenticateWithCredential(cred);
+    await user.updatePassword(nw);
+    document.getElementById('cp-ok').textContent='تم تغيير كلمة المرور بنجاح!';
+    document.getElementById('cp-cur').value='';document.getElementById('cp-new').value='';document.getElementById('cp-conf').value='';
+    toast('تم تغيير كلمة المرور','ok');
+  }catch(er){const m={'auth/wrong-password':'كلمة المرور الحالية خاطئة','auth/weak-password':'كلمة المرور الجديدة ضعيفة','auth/requires-recent-login':'يرجى تسجيل الدخول مجدداً'};document.getElementById('cp-err').textContent=m[er.code]||er.message;}
+  btn.disabled=false;btn.textContent='حفظ كلمة المرور الجديدة';
+}
+
+auth.onAuthStateChanged(user=>{if(user){UID=user.uid;listenUser(user.uid);}});
+
+function listenUser(uid){
+  db.ref('Usersred/'+uid).on('value',snap=>{
+    const d=snap.val();if(!d)return;
+    BALANCE=d.balance||0;CARD_FRZ=d.cardFrozen||false;
+    document.getElementById('auth-screen').style.display='none';
+    document.getElementById('app-screen').style.display='block';
+    document.getElementById('l-btn').disabled=false;document.getElementById('l-btn').textContent='دخول ›';
+    const init=(d.name||d.email||'R').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('sb-av').textContent=init;
+    document.getElementById('sb-nm').textContent=d.name||(d.email||'').split('@')[0];
+    document.getElementById('sb-em').textContent=d.email||'';
+    document.getElementById('h-bal').textContent='$'+BALANCE.toFixed(2);
+    document.getElementById('h-usdt').textContent='≈ '+BALANCE.toFixed(2)+' USDT';
+    document.getElementById('c-bal').textContent='$'+BALANCE.toFixed(2);
+    document.getElementById('vc-holder').textContent=(d.name||'').toUpperCase();
+    document.getElementById('my-addr').textContent=d.email||'—';
+    document.getElementById('sp-b').textContent='$'+BALANCE.toFixed(2);
+    document.getElementById('wp-b').textContent='$'+BALANCE.toFixed(2);
+    document.getElementById('c-status').textContent=CARD_FRZ?'مجمّدة':'نشطة ✓';
+    document.getElementById('c-status').style.color=CARD_FRZ?'var(--danger)':'var(--green)';
+    document.getElementById('freeze-btn').textContent=CARD_FRZ?'✅ إلغاء التجميد':'❄ تجميد';
+    if(CARD_REV){document.getElementById('vc-num').textContent=d.cardNumber||'•••• •••• •••• ••••';document.getElementById('c-cvv').textContent=d.cardCvv||'***';}
+    document.getElementById('pr-name').textContent=d.name||'—';
+    document.getElementById('pr-email').textContent=d.email||'—';
+    document.getElementById('pr-uid').textContent=uid.slice(0,16)+'...';
+    document.getElementById('pr-joined').textContent=d.createdAt?new Date(d.createdAt).toLocaleDateString('ar-SA',{year:'numeric',month:'long',day:'numeric'}):'—';
+    document.getElementById('sec-email').textContent=(d.email||'—')+' ✓';
+    const u=auth.currentUser;
+    if(u?.metadata?.lastSignInTime)document.getElementById('sec-last').textContent=new Date(u.metadata.lastSignInTime).toLocaleDateString('ar-SA',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  });
+  db.ref('Usersred/'+uid+'/transactions').on('child_added',snap=>{
+    const tx=snap.val();if(!tx)return;
+    if(!ALL_TX.find(t=>t.id===snap.key)){ALL_TX.push({...tx,id:tx.id||snap.key});ALL_TX.sort((a,b)=>b.date-a.date);renderStats();renderHomeTx();renderAllTx(CUR_FIL);}
+  });
+  db.ref('Usersred/'+uid+'/transactions').on('child_removed',snap=>{
+    ALL_TX=ALL_TX.filter(t=>t.id!==snap.key);ALL_TX.sort((a,b)=>b.date-a.date);renderStats();renderHomeTx();renderAllTx(CUR_FIL);
+  });
+}
+
+function renderStats(){const s=ALL_TX.filter(t=>t.type==='sent').reduce((a,t)=>a+t.amount,0);const r=ALL_TX.filter(t=>t.type!=='sent').reduce((a,t)=>a+t.amount,0);document.getElementById('sc-sent').textContent='$'+s.toFixed(0);document.getElementById('sc-recv').textContent='$'+r.toFixed(0);document.getElementById('sc-cnt').textContent=ALL_TX.length;}
+
+const TICO={sent:{bg:'rgba(255,68,68,.12)',cl:'#ff4444',ic:'↑'},received:{bg:'rgba(34,197,94,.12)',cl:'#22c55e',ic:'↓'},topup:{bg:'rgba(96,165,250,.12)',cl:'#60a5fa',ic:'+'}};
+const TLBL={sent:'إرسال إلى',received:'استقبال من',topup:'شحن من Perfect Wallet'};
+function txHTML(t){const pos=t.type!=='sent';const cfg=TICO[t.type]||TICO.topup;const d=new Date(t.date);const ds=d.toLocaleDateString('ar-SA',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});const ctr=t.type==='sent'?t.to:t.type==='topup'?'Perfect Wallet':t.from;return`<div class="tx-row"><div class="tx-ico" style="background:${cfg.bg};color:${cfg.cl}">${cfg.ic}</div><div class="tx-inf"><div class="tx-nm">${TLBL[t.type]||t.type}${ctr?' <span style="color:var(--rd3)">'+ctr+'</span>':''}</div><div class="tx-dt">${ds}${t.note?' · '+t.note:''}</div></div><div class="tx-am ${pos?'pos':'neg'}">${pos?'+':'-'}$${t.amount.toFixed(2)}</div></div>`;}
+function renderHomeTx(){const el=document.getElementById('home-tx');const r=ALL_TX.slice(0,5);el.innerHTML=r.length?r.map(txHTML).join(''):'<div class="empty"><span class="ei">📭</span>لا توجد معاملات بعد</div>';}
+function renderAllTx(f){const el=document.getElementById('all-tx');const txs=f==='all'?ALL_TX:ALL_TX.filter(t=>t.type===f);el.innerHTML=txs.length?txs.map(txHTML).join(''):'<div class="empty"><span class="ei">📭</span>لا توجد معاملات</div>';}
+function filTx(f,el){CUR_FIL=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderAllTx(f);}
+
+const PT={home:'الرئيسية',wallet:'المحفظة',card:'البطاقة',txs:'المعاملات',settings:'الإعدادات'};
+
+function om(id){document.getElementById(id).classList.add('open');}
+function cm(id){document.getElementById(id).classList.remove('open');}
+
+function setSA(v){document.getElementById('ms-amt').value=v;updSP();}
+function setWA(v){document.getElementById('w-amt').value=v;updWP();}
+function updSP(){const v=parseFloat(document.getElementById('ms-amt').value)||0;document.getElementById('sp-a').textContent='$'+Math.max(0,BALANCE-v).toFixed(2);}
+function updWP(){const v=parseFloat(document.getElementById('w-amt').value)||0;document.getElementById('wp-a').textContent='$'+Math.max(0,BALANCE-v).toFixed(2);}
+
+async function _send(to,amt,note,errId,btnId,cb){
+  document.getElementById(errId).textContent='';
+  if(!to){document.getElementById(errId).textContent='يرجى إدخال بريد المستلم';return;}
+  if(!amt||amt<=0){document.getElementById(errId).textContent='يرجى إدخال مبلغ صحيح';return;}
+  if(amt>BALANCE){document.getElementById(errId).textContent='رصيد غير كافٍ';return;}
+  const btn=document.getElementById(btnId);btn.disabled=true;btn.innerHTML='<span class="spin"></span> جاري الإرسال...';
+  try{
+    const now=Date.now();
+    await db.ref('Usersred/'+UID+'/balance').set(BALANCE-amt);
+    const txRef=db.ref('Usersred/'+UID+'/transactions').push();
+    await txRef.set({id:txRef.key,type:'sent',from:auth.currentUser.email,to,amount:amt,note,date:now});
+    const rs=await db.ref('Usersred').orderByChild('email').equalTo(to).once('value');
+    rs.forEach(cs=>{const rd=cs.val();db.ref('Usersred/'+cs.key+'/balance').set((rd.balance||0)+amt);const rx=db.ref('Usersred/'+cs.key+'/transactions').push();rx.set({id:rx.key,type:'received',from:auth.currentUser.email,to,amount:amt,note,date:now});});
+    toast('تم إرسال $'+amt.toFixed(2)+' بنجاح','ok');if(cb)cb();
+  }catch(e){document.getElementById(errId).textContent='خطأ: '+e.message;}
+  btn.disabled=false;btn.textContent=btn.getAttribute('data-lbl')||'إرسال ↑';
+}
+
+async function doSendModal(){const to=document.getElementById('ms-to').value.trim(),amt=parseFloat(document.getElementById('ms-amt').value),note=document.getElementById('ms-note').value.trim();await _send(to,amt,note,'ms-err','ms-btn',()=>{document.getElementById('ms-to').value='';document.getElementById('ms-amt').value='';document.getElementById('ms-note').value='';cm('m-send');});document.getElementById('ms-btn').textContent='إرسال ↑';}
+async function doSendW(){const to=document.getElementById('w-to').value.trim(),amt=parseFloat(document.getElementById('w-amt').value),note=document.getElementById('w-note').value.trim();await _send(to,amt,note,'w-err','w-btn',()=>{document.getElementById('w-to').value='';document.getElementById('w-amt').value='';document.getElementById('w-note').value='';});document.getElementById('w-btn').textContent='إرسال ↑';}
+
+function setPWA(v,el){PW_AMT=v;document.getElementById('pw-big').textContent='$'+v;document.querySelectorAll('#pws0 .qa').forEach(q=>q.classList.remove('sel'));if(el)el.classList.add('sel');document.getElementById('pw-custom').value='';}
+function onPWC(inp){PW_AMT=parseFloat(inp.value)||0;document.getElementById('pw-big').textContent='$'+PW_AMT.toFixed(2);document.querySelectorAll('#pws0 .qa').forEach(q=>q.classList.remove('sel'));}
+function showPWS(n){[0,1,2].forEach(i=>document.getElementById('pws'+i).style.display=i===n?'block':'none');document.getElementById('pw-back').style.display=n===1?'block':'none';document.getElementById('pw-ttl').textContent=n===0?'شحن من Perfect Wallet':n===1?'بيانات البطاقة':'تم الشحن!';}
+function pwNext(){document.getElementById('pw-e0').textContent='';if(!PW_AMT||PW_AMT<=0){document.getElementById('pw-e0').textContent='يرجى اختيار مبلغ';return;}document.getElementById('pw-cn').value='';document.getElementById('pw-ex').value='';document.getElementById('pw-cv').value='';showPWS(1);}
+async function verifyPW(){
+  const cnum=document.getElementById('pw-cn').value.replace(/\s/g,''),cvv=document.getElementById('pw-cv').value.trim(),exp=document.getElementById('pw-ex').value.trim();
+  document.getElementById('pw-e1').textContent='';
+  if(cnum.length<16){document.getElementById('pw-e1').textContent='رقم البطاقة غير مكتمل';return;}
+  if(!cvv||cvv.length<3){document.getElementById('pw-e1').textContent='CVV غير صحيح';return;}
+  if(!exp||exp.length<5){document.getElementById('pw-e1').textContent='تاريخ الانتهاء غير صحيح';return;}
+  const btn=document.getElementById('pw-vbtn');btn.disabled=true;btn.innerHTML='<span class="spin"></span> جاري التحقق...';
+  try{
+    const snap=await db.ref('users').once('value');let found=null;
+    if(snap.exists()){snap.forEach(cs=>{const d=cs.val();const sc=(d.cardnumber||d.cardNumber||'').replace(/\s/g,'');const sv=String(d.cvv||d.cardCvv||'');if(sc===cnum&&sv===cvv)found={uid:cs.key,...d};});}
+    if(!found){document.getElementById('pw-e1').textContent='البطاقة غير موجودة في Perfect Wallet أو البيانات خاطئة';btn.disabled=false;btn.textContent='تحقق وشحن ✓';return;}
+    if((found.balance||0)<PW_AMT){document.getElementById('pw-e1').textContent='رصيد Perfect Wallet غير كافٍ (متاح: $'+parseFloat(found.balance||0).toFixed(2)+')';btn.disabled=false;btn.textContent='تحقق وشحن ✓';return;}
+    const now=Date.now(),nrb=BALANCE+PW_AMT,npb=parseFloat(found.balance||0)-PW_AMT;
+    await db.ref('Usersred/'+UID+'/balance').set(nrb);
+    const rt=db.ref('Usersred/'+UID+'/transactions').push();
+    await rt.set({id:rt.key,type:'topup',from:'Perfect Wallet',fromCard:'••••'+cnum.slice(-4),to:auth.currentUser.email,amount:PW_AMT,note:'شحن من Perfect Wallet',date:now});
+    await db.ref('users/'+found.uid+'/balance').set(npb);
+    const pt=db.ref('users/'+found.uid+'/transactions').push();
+    await pt.set({id:pt.key,type:'sent',from:found.email||'',to:'RedotPay',amount:PW_AMT,note:'تحويل لـ RedotPay',date:now});
+    document.getElementById('pw-smsg').textContent='تمت إضافة $'+PW_AMT.toFixed(2)+' من Perfect Wallet';
+    document.getElementById('pw-sbal').textContent='$'+nrb.toFixed(2);
+    showPWS(2);toast('تم الشحن بنجاح','ok');
+  }catch(e){document.getElementById('pw-e1').textContent='خطأ: '+e.message;}
+  btn.disabled=false;btn.textContent='تحقق وشحن ✓';
+}
+
+function revealCard(){CARD_REV=!CARD_REV;const btn=document.getElementById('reveal-btn');if(CARD_REV){db.ref('Usersred/'+UID).once('value').then(s=>{const d=s.val();document.getElementById('vc-num').textContent=d.cardNumber||'•••• •••• •••• ••••';document.getElementById('c-cvv').textContent=d.cardCvv||'***';});btn.textContent='🙈 إخفاء';toast('تم كشف البطاقة','info');}else{document.getElementById('vc-num').textContent='•••• •••• •••• ••••';document.getElementById('c-cvv').textContent='***';btn.textContent='👁 عرض الرقم';}}
+async function freezeCard(){CARD_FRZ=!CARD_FRZ;await db.ref('Usersred/'+UID+'/cardFrozen').set(CARD_FRZ);toast(CARD_FRZ?'تم تجميد البطاقة':'تم تفعيل البطاقة',CARD_FRZ?'err':'ok');}
+function copyCardNum(){db.ref('Usersred/'+UID+'/cardNumber').once('value').then(s=>{const n=s.val()||'';navigator.clipboard.writeText(n.replace(/\s/g,'')).then(()=>toast('تم نسخ رقم البطاقة','ok')).catch(()=>toast('رقم: '+n,'info'));});}
+function copyAddr(){const a=document.getElementById('my-addr').textContent;navigator.clipboard.writeText(a).then(()=>toast('تم نسخ العنوان','ok')).catch(()=>toast(a,'info'));}
+function fmtC(inp){let v=inp.value.replace(/\D/g,'').slice(0,16);inp.value=v.replace(/(.{4})/g,'$1 ').trim();}
+function fmtE(inp){let v=inp.value.replace(/\D/g,'');if(v.length>=2)v=v.slice(0,2)+'/'+v.slice(2,4);inp.value=v;}
+function toggleMenu(){
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('sb-overlay');
+  const btn=document.getElementById('menu-btn');
+  const isOpen=sb.classList.contains('open');
+  if(isOpen){
+    sb.classList.remove('open');
+    ov.classList.remove('show');
+    btn.classList.remove('active');
+  } else {
+    sb.classList.add('open');
+    ov.classList.add('show');
+    btn.classList.add('active');
+  }
+}
+
+// Close menu when nav item clicked
+function gp(name,tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.sni').forEach(t=>t.classList.remove('active'));
+  if(tab)tab.classList.add('active');
+  document.getElementById('tb-ttl').textContent=PT[name]||name;
+  // Close sidebar
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('show');
+  document.getElementById('menu-btn').classList.remove('active');
+}
+
+let _tt;
+function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className='';t.classList.add(type==='ok'?'ok':type==='err'?'err':'info');t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+</body>
+</html>
