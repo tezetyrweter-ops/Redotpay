@@ -596,7 +596,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 <script>
 const fbc={apiKey:"AIzaSyBetwyWx_eOasFFG_IOQF_5_41ltqzDvw4",authDomain:"bank-bb43b.firebaseapp.com",databaseURL:"https://bank-bb43b-default-rtdb.firebaseio.com",projectId:"bank-bb43b",storageBucket:"bank-bb43b.firebasestorage.app",messagingSenderId:"85907355562",appId:"1:85907355562:web:82c5e94d50719161ef1dd3"};
 if(!firebase.apps.length)firebase.initializeApp(fbc);
-const db=firebase.database();
+const auth=firebase.auth();const db=firebase.database();
 let UID=null,BALANCE=0,ALL_TX=[],CUR_FIL='all',CARD_REV=false,CARD_FRZ=false,PW_AMT=0;
 
 function swTab(t){
